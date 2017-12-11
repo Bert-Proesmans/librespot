@@ -13,7 +13,6 @@ extern crate base64;
 extern crate crypto;
 extern crate futures;
 extern crate hyper;
-extern crate mdns;
 extern crate num_bigint;
 extern crate protobuf;
 extern crate rand;
@@ -25,16 +24,22 @@ pub extern crate librespot_core as core;
 pub extern crate librespot_protocol as protocol;
 pub extern crate librespot_metadata as metadata;
 
-#[cfg(feature = "alsa-backend")]
+#[cfg(unix)]
+extern crate mdns;
+
+#[cfg(all(unix, feature = "alsa-backend"))]
 extern crate alsa;
 
-#[cfg(feature = "portaudio-rs")]
+#[cfg(all(unix, feature = "portaudio-rs"))]
+#[cfg(unix)]
 extern crate portaudio_rs;
 
-#[cfg(feature = "libpulse-sys")]
+#[cfg(all(unix, feature = "libpulse-sys"))]
 extern crate libpulse_sys;
 
 pub mod audio_backend;
+
+#[cfg(unix)]
 pub mod discovery;
 pub mod keymaster;
 pub mod mixer;

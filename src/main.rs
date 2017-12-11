@@ -27,10 +27,39 @@ use librespot::core::session::Session;
 use librespot::core::version;
 
 use librespot::audio_backend::{self, Sink, BACKENDS};
-use librespot::discovery::{discovery, DiscoveryStream};
 use librespot::mixer::{self, Mixer};
 use librespot::player::Player;
 use librespot::spirc::{Spirc, SpircTask};
+
+
+//////////////
+// Stubbing //
+//////////////
+
+#[cfg(unix)]
+use librespot::discovery::{discovery, DiscoveryStream};
+
+#[cfg(not(unix))]
+fn discovery(_h: &Handle, _cc: ConnectConfig, _id: String) -> Result<DiscoveryStream, ()> {
+    unimplemented!()
+}
+
+#[cfg(not(unix))]
+struct DiscoveryStream {}
+#[cfg(not(unix))]
+impl Stream for DiscoveryStream {
+    type Item = Credentials;
+    type Error = io::Error;
+
+    fn poll(&mut self) -> Poll<Option<Self::Item>, Self::Error> {
+        unimplemented!()
+    }
+}
+
+
+/////////////
+// Program //
+/////////////
 
 fn usage(program: &str, opts: &getopts::Options) -> String {
     let brief = format!("Usage: {} [options]", program);
@@ -183,7 +212,13 @@ fn setup(args: &[String]) -> Setup {
         }
     };
 
-    let enable_discovery = !matches.opt_present("disable-discovery");
+    let enable_discovery = if cfg!(windows) {
+        // Make sure to force disable discovery mode.
+        false
+    } else {
+        !matches.opt_present("disable-discovery")
+    };
+
 
     Setup {
         backend: backend,
@@ -279,8 +314,8 @@ impl Future for Main {
                 if let Some(ref spirc) = self.spirc {
                     spirc.shutdown();
                 }
+                
                 self.credentials(creds);
-
                 progress = true;
             }
 
