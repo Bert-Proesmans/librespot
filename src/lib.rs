@@ -31,7 +31,6 @@ extern crate mdns;
 extern crate alsa;
 
 #[cfg(all(unix, feature = "portaudio-rs"))]
-#[cfg(unix)]
 extern crate portaudio_rs;
 
 #[cfg(all(unix, feature = "libpulse-sys"))]
