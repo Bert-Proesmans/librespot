@@ -8,6 +8,5 @@ build = "build.rs"
 protobuf = "1.0.10"
 
 [features]
-proto-crc = []
-
-default = ["proto-crc"]
+with-proto-crc = []
+default = ["with-proto-crc"]
