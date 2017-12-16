@@ -1,15 +1,18 @@
 use std::io::prelude::*;
 use std::fs::File;
+use std::env;
 
 mod files;
 
 fn main() {
-    for &(path, expected_checksum) in files::FILES {
-        let actual = cksum_file(path).unwrap();
-        if expected_checksum != actual {
-            panic!("Checksum for {:?} does not match. Try running build.sh", path);
-        }
-    }
+	if env::var("CARGO_FEATURE_PROTO_CRC").is_ok() {
+	    for &(path, expected_checksum) in files::FILES {
+	        let actual = cksum_file(path).unwrap();
+	        if expected_checksum != actual {
+	            panic!("Checksum for {:?} does not match. Try running build.sh", path);
+	        }
+	    }
+	}
 }
 
 fn cksum_file<T: AsRef<std::path::Path>>(path: T) -> std::io::Result<u32> {

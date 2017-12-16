@@ -6,3 +6,8 @@ build = "build.rs"
 
 [dependencies]
 protobuf = "1.0.10"
+
+[features]
+proto-crc = []
+
+default = ["proto-crc"]
