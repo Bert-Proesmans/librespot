@@ -9,4 +9,4 @@ protobuf = "1.0.10"
 
 [features]
 with-proto-crc = []
-default = ["with-proto-crc"]
+default = []

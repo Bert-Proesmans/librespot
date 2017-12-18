@@ -6,7 +6,6 @@ mod files;
 
 fn main() {
 	if env::var("CARGO_FEATURE_WITH_PROTO_CRC").is_ok() {
-		panic!("FEATURE IS SET");
 	    for &(path, expected_checksum) in files::FILES {
 	        let actual = cksum_file(path).unwrap();
 	        if expected_checksum != actual {
