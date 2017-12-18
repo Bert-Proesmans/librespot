@@ -32,6 +32,9 @@ use self::pulseaudio::PulseAudioSink;
 mod pipe;
 use self::pipe::StdoutSink;
 
+mod dynamic_pipe;
+use self::dynamic_pipe::DynamicSink;
+
 pub const BACKENDS : &'static [
     (&'static str, fn(Option<String>) -> Box<Sink>)
 ] = &[
@@ -50,4 +53,18 @@ pub fn find(name: Option<String>) -> Option<fn(Option<String>) -> Box<Sink>> {
     } else {
         Some(BACKENDS.first().expect("No backends were enabled at build time").1)
     }
+}
+
+pub fn build_dynamic_sink<W>(writer: W) -> Box<Sink>
+where for<'r> W: FnMut(&'r [u8]) -> io::Result<()> + Send + 'static
+{
+    Box::new(DynamicSink {
+        writer: writer
+    })
+}
+
+pub fn dynamic_sink<W>() -> fn(W) -> Box<Sink>
+where for<'r> W: FnMut(&'r [u8]) -> io::Result<()> + Send + 'static
+{
+    build_dynamic_sink
 }
